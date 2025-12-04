@@ -11,6 +11,7 @@ from typing import Tuple
 import cv2
 import numpy as np
 import torch
+import warnings
 
 import uvd
 from utils.reader import RerunEpisodeReader
@@ -18,6 +19,14 @@ from utils.reader import RerunEpisodeReader
 
 DEFAULT_DATA_DIR = "/Data/1114_left_fr3_insert_pinboard_Generalize_82ep/episode_0001"
 AVAILABLE_PREPROCESSORS = ["vip", "r3m", "liv", "clip", "dino-v2", "vc-1", "resnet"]
+
+# Suppress noisy deprecation warnings from torch/torchvision that do not affect behavior.
+for _msg in [
+    "size_average and reduce args will be deprecated",
+    "The parameter 'pretrained' is deprecated since 0.13",
+    "Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13",
+]:
+    warnings.filterwarnings("ignore", message=_msg, category=UserWarning)
 def _append_keyframe_flags(episode_dir: Path, keyframe_frame_ids):
     """Append is_keyframe flag into the original data.json."""
     json_path = episode_dir / "data.json"
