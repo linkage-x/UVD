@@ -49,7 +49,7 @@ class RerunEpisodeReader:
         # None or dict[str, np.ndarray]
         self._rotation_transform = rotation_transform
 
-    def return_episode_data(self, episode_idx, skip_steps_nums=1):
+    def return_episode_data(self, episode_idx, skip_steps_nums=1, keyframe_indices=None):
         # Load episode data on-demand
         episode_dir = os.path.join(self.task_dir, f"episode_{episode_idx:04d}")
         json_path = os.path.join(episode_dir, self.json_file)
@@ -72,6 +72,8 @@ class RerunEpisodeReader:
         # Loop over the data entries and process each one
         counter = 0
         skip_steps_nums = int(skip_steps_nums)
+        keyframe_indices_set = None if keyframe_indices is None \
+                               else set(int(idx) for idx in keyframe_indices)
         if skip_steps_nums > self._action_prediction_step:
             self._action_prediction_step = skip_steps_nums
         len_json_file = len(json_file['data'])
@@ -247,10 +249,12 @@ class RerunEpisodeReader:
                 else:
                     cur_obs[key] = np.hstack((cur_obs[key], tool_state["position"]))
             
+            frame_idx = item_data.get('idx', counter)
+            is_keyframe = keyframe_indices_set is not None and frame_idx in keyframe_indices_set
             if counter % skip_steps_nums == 0:
                 episode_data.append(
                     {
-                        'idx': item_data.get('idx', 0),
+                        'idx': frame_idx,
                         'colors': colors,
                         'colors_time_stamp': colors_time_stamp,
                         'depths': depths,
@@ -263,7 +267,7 @@ class RerunEpisodeReader:
                         'audios': audios,
                         'actions': cur_actions,
                         'observations': cur_obs,
-                        # 'is_keyframe': False # TODO: impl this, use uvd keyframe detector
+                        'is_keyframe': is_keyframe,
                     }
                 )
             counter += 1

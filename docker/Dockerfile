@@ -71,23 +71,19 @@ COPY datasets /workspace/datasets
 COPY scripts /workspace/scripts
 
 # Install standalone visual foundation models referenced in README (always on)
-RUN set -eux;
+RUN set -eux; 
+RUN ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "git+https://github.com/facebookresearch/vip.git"; \
+    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "git+https://github.com/facebookresearch/r3m.git";
+    
+RUN ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "git+https://github.com/penn-pal-lab/LIV.git"; \
+    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "git+https://github.com/penn-pal-lab/LIV.git#subdirectory=liv/models/clip";
 
-RUN git clone https://github.com/facebookresearch/vip.git /tmp/vip; \
-    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e /tmp/vip; \
-    rm -rf /tmp/vip;
-RUN git clone https://github.com/facebookresearch/r3m.git /tmp/r3m; \
-    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e /tmp/r3m; \
-    rm -rf /tmp/r3m;
-RUN git clone https://github.com/penn-pal-lab/LIV.git /tmp/LIV; \
-    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e /tmp/LIV; \
-    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e /tmp/LIV/liv/models/clip; \
-    rm -rf /tmp/LIV;
-RUN git clone https://github.com/facebookresearch/eai-vc.git /tmp/eai-vc; \
-    ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e /tmp/eai-vc/vc_models; \
-    rm -rf /tmp/eai-vc
+RUN ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "git+https://github.com/facebookresearch/eai-vc.git#subdirectory=vc_models"
 
 RUN ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir "pip<24" "setuptools==59.5.0" "wheel==0.38.4" && \
     ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -r requirements.txt && \
     ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir -e .
+
+RUN ${CONDA_DIR}/bin/conda run -n uvd pip install --no-cache-dir httpx[socks] glog
+
 CMD ["/bin/bash"]
