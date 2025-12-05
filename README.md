@@ -1,3 +1,32 @@
+
+```
+docker pull ghcr.io/linkage-x/uvd-hirol:v0
+```
+From docker/docker-compose.yml hit 'Run Service', and you need to install the `Containers` plugin in the vscode.
+
+Attach to the running container's shell,
+```
+conda activate uvd
+python utils/batch_pickkf.py --help
+usage: batch_pickkf.py [-h] [--root_dir ROOT_DIR] [--preprocessor PREPROCESSOR] [--cam_name CAM_NAME] [--skip_steps SKIP_STEPS] [--append_original_data] [--no-append_original_data] [--output_dir OUTPUT_DIR]
+
+Batch run pickkf over all episodes.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --root_dir ROOT_DIR   Directory containing episode_xxxx folders.
+  --preprocessor PREPROCESSOR
+                        Preprocessor name (available: vip, r3m, liv, clip, dino-v2, vc-1, resnet).
+  --cam_name CAM_NAME   Camera key under colors to use as UVD input.
+  --skip_steps SKIP_STEPS
+                        Skip interval when reading episode data.
+  --append_original_data
+                        Append is_keyframe flag back to data.json (default: True).
+  --no-append_original_data
+                        Do not modify the original data.json.
+  --output_dir OUTPUT_DIR
+                        Optional directory to save per-episode pickle outputs.
+```
 # Universal Visual Decomposer: <br>Long-Horizon Manipulation Made Easy
 
 <div align="center">
